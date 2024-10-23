@@ -1,2 +1,2 @@
-runtime\python.exe webui.py zh_CN
+runtime\python.exe webui.py
 pause
