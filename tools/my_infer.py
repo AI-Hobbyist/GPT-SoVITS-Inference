@@ -127,8 +127,7 @@ def get_models(model_path):
     model_list = []
     for mod in models:
         model_name = Path(mod).name
-        if model_name != "default":
-            model_list.append(model_name)
+        model_list.append(model_name)
     return model_list
 
 # 根据模型名称获取角色列表
