@@ -127,7 +127,8 @@ def get_models(model_path):
     model_list = []
     for mod in models:
         model_name = Path(mod).name
-        model_list.append(model_name)
+        if model_name != "default":
+            model_list.append(model_name)
     return model_list
 
 # 根据模型名称获取角色列表
@@ -136,6 +137,10 @@ def get_speakers(model_path):
     random_spk = glob(f"{model_path}/reference_audios/randoms/*")
     s_speakers = []
     r_speakers = []
+    if len(static_spk) == 0:
+        static_spk = ["不支持的合成方式"]
+    if len(random_spk) == 0:
+        random_spk = ["不支持的合成方式"]
     for spk in static_spk:
         speaker_name = Path(spk).name
         s_speakers.append(speaker_name)
@@ -182,29 +187,38 @@ def get_model_path(model_path):
 def get_s_lang(model_path, speaker_name):
     s_ref_langs = glob(f"{model_path}/reference_audios/emotions/{speaker_name}/*")
     s_langs = []
-    for lang in s_ref_langs:
-        lang_name = Path(lang).name
-        s_langs.append(lang_name)
+    if len(s_ref_langs) == 0:
+        s_langs.append("None")
+    else:
+        for lang in s_ref_langs:
+            lang_name = Path(lang).name
+            s_langs.append(lang_name)
     return s_langs
 
 # 获取固定角色情感参考音频池支持的情感
 def get_s_emotions(model_path, speaker_name, lang_name):
     s_ref_emotions = glob(f"{model_path}/reference_audios/emotions/{speaker_name}/{lang_name}/*")
     s_emotions = []
-    for emo in s_ref_emotions:
-        emotion_file = Path(emo).name
-        emotion, emo_text = get_emotion_text(emotion_file)
-        s_emotions.append(emotion)
+    if len(s_ref_emotions) == 0:
+        s_emotions.append("None")
+    else:
+        for emo in s_ref_emotions:
+            emotion_file = Path(emo).name
+            emotion, emo_text = get_emotion_text(emotion_file)
+            s_emotions.append(emotion)
     return s_emotions
 
 # 获取固定角色情感参考音频池的情绪参考文本
 def get_s_emo_text(model_path, speaker_name, lang_name, emotion):
     s_ref_emotions = glob(f"{model_path}/reference_audios/emotions/{speaker_name}/{lang_name}/*")
-    for emo in s_ref_emotions:
-        emotion_file = Path(emo).name.replace(".wav", "")
-        emo_emotion, emo_text = get_emotion_text(emotion_file)
-        if emotion == emo_emotion:
-            return emo_text
+    if len(s_ref_emotions) != 0:
+        for emo in s_ref_emotions:
+            emotion_file = Path(emo).name.replace(".wav", "")
+            emo_emotion, emo_text = get_emotion_text(emotion_file)
+            if emotion == emo_emotion:
+                return emo_text
+    else:
+        return "None"
         
 # 根据角色名更新固定角色情感参考音频池的语言和情感
 def update_s_lang_emo(model_path, speaker_name):
@@ -229,17 +243,24 @@ def update_s_emo_text(model_path, speaker_name, lang_name, emotion):
 def get_r_lang(model_path, speaker_name):
     r_ref_langs = glob(f"{model_path}/reference_audios/randoms/{speaker_name}/*")
     r_langs = []
-    for lang in r_ref_langs:
-        lang_name = Path(lang).name
-        r_langs.append(lang_name)
+    if len(r_ref_langs) == 0:
+        r_langs.append("None")
+    else:
+        for lang in r_ref_langs:
+            lang_name = Path(lang).name
+            r_langs.append(lang_name)
     return r_langs
 
 # 获取随机参考音频池的随机参考音频文件名以及参考文本
 def get_ref_audio_random(model_path, speaker_name, lang_name):
     r_ref_audios = glob(f"{model_path}/reference_audios/randoms/{speaker_name}/{lang_name}/*.wav")
-    ref_audio = choice(r_ref_audios)
-    ref_text_name = ref_audio.replace(".wav", ".lab")
-    ref_text = Path(ref_text_name).read_text(encoding="utf-8")
+    if len(r_ref_audios) == 0:
+        ref_audio = "None"
+        ref_text = "None"
+    else:
+        ref_audio = choice(r_ref_audios)
+        ref_text_name = ref_audio.replace(".wav", ".lab")
+        ref_text = Path(ref_text_name).read_text(encoding="utf-8")
     return ref_audio, ref_text
 
 # 根据角色名更新随机参考音频池的语言
@@ -273,8 +294,10 @@ def load_model(model_path, model_name):
 # 角色与情感
 def infer_by_spk_emo(text, language, speaker, emotion, emo_text, emo_lang, top_k, top_p, temperature, cut_method, batch_size, batch_threshold, split_bucket, speed, fragment_interval, seed, media_type, parallel_infer, repetition_penalty, output_path, model_path):
     audio_path = None
-    if model_path == "请选择模型":
+    if model_path == "None":
         msg = "请先选择模型！"
+    elif emo_lang == "None":
+        msg = "当前模型不支持角色与情感合成！"
     elif text == "":
         msg = "请输入要合成的文本！"
     else:
@@ -289,7 +312,7 @@ def infer_by_spk_emo(text, language, speaker, emotion, emo_text, emo_lang, top_k
 # 自定义参考音频
 def infer_by_ref_audio(text, language, ref_audio, ref_text, p_lang, top_k, top_p, temperature, cut_method, batch_size, batch_threshold, split_bucket, speed, fragment_interval, seed, media_type, parallel_infer, repetition_penalty, output_path, model_path):
     audio_path = None
-    if model_path == "请选择模型":
+    if model_path == "None":
         msg = "请先选择模型！"
     elif text == "":
         msg = "请输入要合成的文本！"
@@ -313,8 +336,10 @@ def infer_by_ref_audio(text, language, ref_audio, ref_text, p_lang, top_k, top_p
 # 随机参考音频
 def infer_by_random_ref(text, language, ref_audio, ref_text, p_lang, top_k, top_p, temperature, cut_method, batch_size, batch_threshold, split_bucket, speed, fragment_interval, seed, media_type, parallel_infer, repetition_penalty, output_path, model_path):
     audio_path = None
-    if model_path == "请选择模型":
+    if model_path == "None":
         msg = "请先选择模型！"
+    elif p_lang == "None":
+        msg = "当前模型不支持随机参考音频合成！"
     elif text == "":
         msg = "请输入要合成的文本！"
     else:
