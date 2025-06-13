@@ -13,6 +13,7 @@ import uvicorn
 from pathlib import Path
 import webbrowser
 import signal
+import io
 import mimetypes
 from typing import Literal
 
@@ -78,7 +79,7 @@ class openaiLikeInfer(BaseModel):
 class requestVersion(BaseModel):
     version: str
     
-class shutdown(BaseModel):
+class Shutdown(BaseModel):
     password: str
     
 class inferWithEmotions(BaseModel):
@@ -290,7 +291,7 @@ async def openai_like_infer_func(model: openaiLikeInfer):
                     }
                 }
             else:
-                return StreamingResponse(audio_byte, media_type=f"audio/{model.response_format}")   
+                return StreamingResponse(io.BytesIO(audio_byte), media_type=f"audio/{model.response_format}")   
 
     except Exception as e:
         print(e)
@@ -335,7 +336,7 @@ async def delete_model_func(model: checkModelInstalled):
 
 # 关闭服务
 @APP.post("/shutdown")
-async def shutdown(model: shutdown):
+async def shutdown(model: Shutdown):
     shutdown_password = "wYdjEHnnjrNAahFsQ0yVmv1TEeUU9Z8A"  # 设置关闭密码
     if model.password == shutdown_password:
         os.kill(os.getpid(), signal.SIGINT)
