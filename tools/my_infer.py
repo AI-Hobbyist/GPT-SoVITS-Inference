@@ -21,14 +21,11 @@ from time import time
 from datetime import datetime
 from pydub import AudioSegment
 from shutil import move, rmtree
-from typing import Generator, TYPE_CHECKING
 from config import is_half, infer_device, force_half_infer, force_gpu_infer
-from tqdm import tqdm
 from GPT_SoVITS.TTS_infer_pack.text_segmentation_method import get_method
 import wave
 
-if TYPE_CHECKING:
-    from gsvi import otherParams
+from .data_models import otherParams
 
 #===============推理预备================
 def create_weight_dirs():
