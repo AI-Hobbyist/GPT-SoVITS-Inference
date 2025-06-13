@@ -23,7 +23,6 @@ from pydub import AudioSegment
 from shutil import move, rmtree
 from config import is_half, infer_device, force_half_infer, force_gpu_infer
 from GPT_SoVITS.TTS_infer_pack.text_segmentation_method import get_method
-import wave
 
 from .data_models import otherParams
 

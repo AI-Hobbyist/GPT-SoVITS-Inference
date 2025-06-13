@@ -6,7 +6,6 @@ from tools.my_infer import get_multi_ref_template, create_speaker_list, single_i
 from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import argparse
 import uvicorn
@@ -16,7 +15,6 @@ import signal
 import io
 import mimetypes
 from tools.data_models import requestVersion, inferWithClassic, inferWithEmotions, inferWithMulti ,installModel, openaiLikeInfer, checkModelInstalled , Shutdown
-from typing import Literal
 
 #===========================启动参数===========================
 parser = argparse.ArgumentParser(description="TTS Inference API")
