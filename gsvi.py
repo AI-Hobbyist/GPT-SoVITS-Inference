@@ -2,6 +2,7 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+from tools.data_models import requestVersion, inferWithClassic, inferWithEmotions, inferWithMulti ,installModel, openaiLikeInfer, checkModelInstalled , Shutdown
 from tools.my_infer import get_multi_ref_template, create_speaker_list, single_infer, multi_infer, pre_infer, get_classic_model_list, classic_infer, get_version, check_installed, install_model, delete_model, openai_like_infer
 from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.responses import FileResponse, StreamingResponse
@@ -12,9 +13,7 @@ import uvicorn
 from pathlib import Path
 import webbrowser
 import signal
-import io
 import mimetypes
-from tools.data_models import requestVersion, inferWithClassic, inferWithEmotions, inferWithMulti ,installModel, openaiLikeInfer, checkModelInstalled , Shutdown
 
 #===========================启动参数===========================
 parser = argparse.ArgumentParser(description="TTS Inference API")
@@ -168,7 +167,7 @@ async def openai_like_infer_func(model: openaiLikeInfer):
                     }
                 }
             else:
-                return StreamingResponse(io.BytesIO(audio_byte), media_type=f"audio/{model.response_format}")   
+                return StreamingResponse(audio_byte, media_type=f"audio/{model.response_format}")    # type: ignore
 
     except Exception as e:
         print(e)
