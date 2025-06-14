@@ -4,8 +4,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from tools.data_models import requestVersion, inferWithClassic, inferWithEmotions, inferWithMulti ,installModel, openaiLikeInfer, checkModelInstalled , Shutdown
 from tools.my_infer import get_multi_ref_template, create_speaker_list, single_infer, multi_infer, pre_infer, get_classic_model_list, classic_infer, get_version, check_installed, install_model, delete_model, openai_like_infer
-from fastapi import FastAPI, File, UploadFile, Request
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi import FastAPI, File, UploadFile, Request, Response
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import argparse
@@ -43,7 +43,7 @@ APP.add_middleware(
     allow_methods=["*"],  # 允许的请求方法
     allow_headers=["*"],  # 允许的请求头
 )
-    
+
 # 初始化
 @APP.get("/api")
 async def root():

@@ -107,6 +107,37 @@ def pack_aac(io_buffer:BytesIO, data:np.ndarray, rate:int):
     io_buffer.write(out)
     return io_buffer
 
+def pack_mp3(io_buffer:BytesIO, data:np.ndarray, rate:int):
+    """
+    将 PCM 音频数据打包为 MP3 格式并写入 BytesIO 对象。
+
+    Args:
+        io_buffer (BytesIO): 要写入 MP3 数据的 BytesIO 对象。
+        data (np.ndarray): 包含 16 位有符号小端整数 PCM 数据的 NumPy 数组。
+        rate (int): 音频数据的采样率。
+
+    Returns:
+        BytesIO: 包含 MP3 数据的 BytesIO 对象。
+    """
+    process = subprocess.Popen([
+        'ffmpeg',
+        '-f', 's16le',  # 输入16位有符号小端整数PCM
+        '-ar', str(rate),  # 设置采样率
+        '-ac', '1',  # 单声道
+        '-i', 'pipe:0',  # 从管道读取输入
+        '-c:a', 'libmp3lame',  # 音频编码器更改为 MP3 (libmp3lame)
+        '-b:a', '192k',  # 比特率
+        '-vn',  # 不包含视频
+        '-f', 'mp3',  # 输出格式更改为 MP3
+        'pipe:1'  # 将输出写入管道
+    ], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    # 将 NumPy 数组转换为字节流作为 ffmpeg 的输入
+    out, _ = process.communicate(input=data.tobytes())
+
+    io_buffer.write(out)
+    return io_buffer
+
 def pack_audio(io_buffer:BytesIO, data:np.ndarray, rate:int, media_type:str):
     if media_type == "ogg":
         io_buffer = pack_ogg(io_buffer, data, rate)
@@ -114,6 +145,8 @@ def pack_audio(io_buffer:BytesIO, data:np.ndarray, rate:int, media_type:str):
         io_buffer = pack_aac(io_buffer, data, rate)
     elif media_type == "wav":
         io_buffer = pack_wav(io_buffer, data, rate)
+    elif media_type == "mp3":
+        io_buffer = pack_mp3(io_buffer, data, rate)
     else:
         io_buffer = pack_raw(io_buffer, data, rate)
     io_buffer.seek(0)
@@ -139,7 +172,6 @@ def tts_infer(text, text_lang, ref_audio_path, prompt_text, prompt_lang, top_k, 
         "speed_factor": speed_facter,
         "fragment_interval": fragment_interval,
         "seed": seed,
-        "media_type": media_type,
         "parallel_infer": parallel_infer,
         "repetition_penalty": repetition_penalty,
         "sample_steps": sample_steps,
