@@ -10,7 +10,6 @@ import numpy as np
 import soundfile as sf
 import torch
 import gc
-from gsvi_server.openai_like_model import otherParams
 from tools.logger import logger
 from GPT_SoVITS.TTS_infer_pack.TTS import TTS, TTS_Config
 from glob import glob
@@ -19,7 +18,7 @@ from re import split
 from io import BytesIO
 from random import choice, randint
 from hashlib import md5
-from time import time
+from time import time, sleep
 from datetime import datetime
 from pydub import AudioSegment
 from shutil import move, rmtree
@@ -286,12 +285,18 @@ def move_model_files(version, categroy, lang, model):
 #===============接口函数================
 def get_version() -> list[str]:
     """ 获取所有支持版本 """
-    versions = ["v2", "v3", "v4", "v2Pro", "v2ProPlus"]
-    return versions
+    versions = glob("models/*")
+    supports = []
+    openai_like = []
+    for version in versions:
+        version_name = Path(version).name
+        supports.append(version_name)
+        openai_like.append(f"GSVI-{version_name}")
+    return supports, openai_like
 
 def version_support(version: str) -> bool:
     """ 检查版本是否支持 """
-    support_versions = get_version()
+    support_versions, _ = get_version()
     if version not in support_versions:
         return False
     else:
@@ -493,7 +498,30 @@ def classic_infer(gpt_model_name, sovits_model_name, ref_audio_path, prompt_text
     return audio_path, msg
 
 #=========OpenAI语音合成兼容接口=========
-def openai_like_infer(model, input, voice, response_format, speed, other_options: otherParams):
+# 模型列表
+def openai_like_model_list():
+    _, model_ids = get_version()
+    model_data_list = []
+    for model_id in model_ids:
+        current_timestamp = int(time())
+        
+        model_entry = {
+            "id": model_id,
+            "object": "model",
+            "created": current_timestamp,
+            "owned_by": "openai"  # 或者 "openai"，随你喜欢
+        }
+        model_data_list.append(model_entry)
+        sleep(0.1)  # 确保时间戳不同
+    final_response = {
+    "object": "list",
+    "data": model_data_list
+    }
+    return final_response
+
+
+# 推理函数
+def openai_like_infer(model, input, voice, response_format, speed, other_options):
     version = model.split("-")[1]
     if not version_support(version):
         msg = "不支持该版本！"
@@ -543,13 +571,24 @@ def openai_like_infer(model, input, voice, response_format, speed, other_options
             )
         msg = "合成成功"
     return audio_data, msg
-            
-            
-    
-        
-        
-        
+                    
 #===============一键安装================
+# 获取已安装模型列表
+def get_installed_models(version):
+    model_list = []
+    if not version_support(version):
+        msg = "不支持该版本！"
+    else:
+        installed_models = glob(f"models/{version}/*")
+        if len(installed_models) == 0:
+            msg = "该版本暂无已安装模型！"
+        else:
+            for model in installed_models:
+                model_name = Path(model).name
+                model_list.append(model_name)
+            msg = "获取已安装模型列表成功"
+    return model_list, msg
+
 # 检测是否已安装对应模型
 def check_installed(version, categroy, lang, model_name):
     if Path(f'models/{version}/{categroy}-{lang}-{model_name}').exists():
