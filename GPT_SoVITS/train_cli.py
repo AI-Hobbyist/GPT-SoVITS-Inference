@@ -86,7 +86,7 @@ if __name__ == "__main__":
     preprocess_parser = subparsers.add_parser("preprocess", help="预处理数据集")
     preprocess_parser.add_argument("--version", type=str, default="v2ProPlus", help="模型版本 (v1, v2, v3, v4, v2Pro, v2ProPlus)")
     preprocess_parser.add_argument("-l","--data_list", type=str, required=True, help="数据列表文件路径，扩展名 .list，每行格式：完整音频路径|说话人名称|语言标签(ZH/EN/JA/KO/YUE)|文本内容")
-    preprocess_parser.add_argument("-raw","--raw_wav_dir", type=str, default=None, help="原始 WAV 文件目录，默认使用 list 中的完整路径")
+    preprocess_parser.add_argument("-raw","--raw_wav_dir", type=str, default="", help="原始 WAV 文件目录，默认使用 list 中的完整路径")
     preprocess_parser.add_argument("-exp","--exp_name", type=str, required=True, help="实验名称")
     preprocess_parser.add_argument("--gpu_n_1a", type=str, default="0-0-0-0-0-0-0-0", help="用于预处理的 GPU 编号 (1a)，单卡多进程示例：0-0-0-0，多卡多进程示例：0-0-1-1")
     preprocess_parser.add_argument("--gpu_n_1Ba", type=str, default="0-0-0-0-0-0-0-0", help="用于预处理的 GPU 编号 (1Ba)，单卡多进程示例：0-0-0-0，多卡多进程示例：0-0-1-1")
