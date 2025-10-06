@@ -588,6 +588,7 @@ process_name_gpt = i18n("GPT训练")
 
 
 def open1Bb(
+    version,
     batch_size,
     total_epoch,
     exp_name,

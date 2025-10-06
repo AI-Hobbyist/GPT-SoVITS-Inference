@@ -65,6 +65,7 @@ def train_gpt(version, batch_size, total_epoch, exp_name, if_dpo, if_save_latest
     if version in ["v1", "v2", "v3", "v4", "v2Pro", "v2ProPlus"]:
         _, gpt, _ = get_pretrained_paths(version)
         for progress, *_ in open1Bb(
+            version,
             batch_size,
             total_epoch,
             exp_name,
