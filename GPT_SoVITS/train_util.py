@@ -1,7 +1,11 @@
 import os
 import sys
 
-os.environ["version"] = version = "v2Pro"
+def set_version(v):
+    global version
+    version = v
+    os.environ["version"] = version
+
 now_dir = os.getcwd()
 sys.path.insert(0, now_dir)
 import warnings

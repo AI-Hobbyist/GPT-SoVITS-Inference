@@ -1,4 +1,4 @@
-from GPT_SoVITS.train_util import open1abc, open1Ba, open1Bb
+from GPT_SoVITS.train_util import open1abc, open1Ba, open1Bb, set_version
 from config import pretrained_sovits_name, pretrained_gpt_name, cnhubert_path, bert_path
 import argparse
 
@@ -20,6 +20,7 @@ def get_pretrained_paths(version):
 # 预处理数据集
 def preprocess_dataset(version, data_list, raw_wav_dir, exp_name, gpu_n_1a, gpu_n_1Ba, gpu_n_1c):
     if version in ["v1", "v2", "v3", "v4", "v2Pro", "v2ProPlus"]:
+        set_version(version)
         sovits, _, _ = get_pretrained_paths(version)
         for progress, *_ in open1abc(
             version,
@@ -40,6 +41,7 @@ def preprocess_dataset(version, data_list, raw_wav_dir, exp_name, gpu_n_1a, gpu_
 # 训练 SoVITS 模型
 def train_sovits(version, batch_size, total_epoch, exp_name, text_low_lr_rate, if_save_latest, if_save_every_weights, save_every_epoch, gpu_numbers1Ba, if_grad_ckpt, lora_rank):
     if version in ["v1", "v2", "v3", "v4", "v2Pro", "v2ProPlus"]:
+        set_version(version)
         sovits_g, _, sovits_d = get_pretrained_paths(version)
         for progress, *_ in open1Ba(
             version,
@@ -63,6 +65,7 @@ def train_sovits(version, batch_size, total_epoch, exp_name, text_low_lr_rate, i
 # 训练 GPT 模型
 def train_gpt(version, batch_size, total_epoch, exp_name, if_dpo, if_save_latest, if_save_every_weights, save_every_epoch, gpu_numbers):
     if version in ["v1", "v2", "v3", "v4", "v2Pro", "v2ProPlus"]:
+        set_version(version)
         _, gpt, _ = get_pretrained_paths(version)
         for progress, *_ in open1Bb(
             version,
