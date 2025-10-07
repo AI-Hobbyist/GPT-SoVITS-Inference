@@ -1,6 +1,10 @@
-from GPT_SoVITS.train_util import open1abc, open1Ba, open1Bb, set_version
+from GPT_SoVITS.train_util import open1abc, open1Ba, open1Bb
 from config import pretrained_sovits_name, pretrained_gpt_name, cnhubert_path, bert_path
 import argparse
+import os
+
+def set_version(version):
+    os.environ["version"] = version
 
 # D模型
 pretrained_sovits_d_models = {

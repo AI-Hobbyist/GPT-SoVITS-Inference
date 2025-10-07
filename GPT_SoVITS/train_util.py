@@ -1,10 +1,6 @@
 import os
 import sys
-
-def set_version(v):
-    global version
-    version = v
-    os.environ["version"] = version
+os.environ["version"] = version = "v2Pro"
 
 now_dir = os.getcwd()
 sys.path.insert(0, now_dir)
