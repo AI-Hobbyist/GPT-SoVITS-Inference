@@ -11,7 +11,7 @@ pretrained_sovits_d_models = {
     "v1": "GPT_SoVITS/pretrained_models/s2D488k.pth",
     "v2": "GPT_SoVITS/pretrained_models/gsv-v2final-pretrained/s2D2333k.pth",
     "v2Pro": "GPT_SoVITS/pretrained_models/v2Pro/s2Dv2Pro.pth",
-    "v2ProPlus": "GPT_SoVITS/pretrained_models/v2ProPlus/s2Dv2ProPlus.pth"
+    "v2ProPlus": "GPT_SoVITS/pretrained_models/v2Pro/s2Dv2ProPlus.pth"
 }
 
 # 获取对应版本预训练权重路径
